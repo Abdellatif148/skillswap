@@ -14,22 +14,13 @@ const Hero = () => {
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
-          <div className="space-y-8 animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-card rounded-full shadow-card border border-border">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Trade skills, not money</span>
-            </div>
-            
+          <div className="space-y-6 animate-slide-up">
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-foreground">
-              Learn Anything,
-              <br />
-              <span className="bg-gradient-hero bg-clip-text text-transparent">
-                Teach Something
-              </span>
+              Find a Skill Partner Today.
             </h1>
             
             <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
-              Join a global community where knowledge is currency. Exchange skills directly with others and grow together.
+              Teach what you know. Learn what you love.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
@@ -38,33 +29,9 @@ const Hero = () => {
                 onClick={() => navigate("/auth")}
                 className="bg-primary hover:bg-primary-dark text-primary-foreground shadow-soft group"
               >
-                Get Started Free
+                Start Swapping Skills
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-border hover:bg-muted"
-              >
-                How It Works
-              </Button>
-            </div>
-            
-            {/* Stats */}
-            <div className="flex gap-8 pt-8 border-t border-border">
-              <div>
-                <div className="text-3xl font-bold text-foreground">10K+</div>
-                <div className="text-sm text-muted-foreground">Active Members</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-foreground">500+</div>
-                <div className="text-sm text-muted-foreground">Skills Shared</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-foreground">95%</div>
-                <div className="text-sm text-muted-foreground">Match Success</div>
-              </div>
             </div>
           </div>
           

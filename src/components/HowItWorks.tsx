@@ -1,26 +1,21 @@
-import { UserPlus, Search, Video, Star } from "lucide-react";
+import { UserPlus, Search, BookOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const steps = [
   {
     icon: UserPlus,
-    title: "Create Your Profile",
-    description: "List the skills you can teach and what you want to learn",
+    title: "Add your skills",
+    description: "List the skills you can teach and what you want to learn.",
   },
   {
     icon: Search,
-    title: "Get Matched",
-    description: "Our AI finds perfect skill partners based on your interests",
+    title: "Get matched",
+    description: "Our AI finds perfect skill partners based on your interests.",
   },
   {
-    icon: Video,
-    title: "Start Learning",
-    description: "Connect via video calls and begin your skill exchange",
-  },
-  {
-    icon: Star,
-    title: "Earn & Grow",
-    description: "Build your reputation and unlock new opportunities",
+    icon: BookOpen,
+    title: "Learn & teach",
+    description: "Connect with your partner and start the skill exchange.",
   },
 ];
 
@@ -30,14 +25,14 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
-            How SkillSwap Works
+            How It Works
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Four simple steps to start your learning journey
+            Three simple steps to start your learning journey.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {steps.map((step, index) => (
             <Card 
               key={index}
