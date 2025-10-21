@@ -27,9 +27,22 @@ const Auth = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
+    const checkProfile = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("profile_completed")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.profile_completed) {
+          navigate("/dashboard");
+        } else {
+          navigate("/profile-setup");
+        }
+      }
+    };
+    checkProfile();
   }, [user, navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -77,14 +90,14 @@ const Auth = () => {
             title: "Welcome back!",
             description: "Successfully logged in",
           });
-          navigate("/dashboard");
+          // Redirect will happen in useEffect after user state updates
         }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/profile-setup`,
           },
         });
 

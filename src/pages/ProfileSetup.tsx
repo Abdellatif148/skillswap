@@ -70,15 +70,6 @@ const ProfileSetup = () => {
       return;
     }
 
-    if (skills.length === 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please add at least one skill",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -94,19 +85,24 @@ const ProfileSetup = () => {
 
       if (profileError) throw profileError;
 
-      // Insert skills
-      const skillsData = skills.map((skill) => ({
-        user_id: user?.id,
-        skill_name: skill.name,
-        skill_type: skill.type,
-        skill_level: skill.level,
-      }));
+      // Insert skills if any were added
+      if (skills.length > 0) {
+        // Delete any existing skills first
+        await supabase.from("skills").delete().eq("user_id", user?.id);
 
-      const { error: skillsError } = await supabase
-        .from("skills")
-        .insert(skillsData);
+        const skillsData = skills.map((skill) => ({
+          user_id: user?.id,
+          skill_name: skill.name,
+          skill_type: skill.type,
+          skill_level: skill.level,
+        }));
 
-      if (skillsError) throw skillsError;
+        const { error: skillsError } = await supabase
+          .from("skills")
+          .insert(skillsData);
+
+        if (skillsError) throw skillsError;
+      }
 
       toast({
         title: "Profile completed!",
@@ -164,7 +160,12 @@ const ProfileSetup = () => {
             </div>
 
             <div className="space-y-4">
-              <Label>Skills *</Label>
+              <div>
+                <Label>Your Skills (Optional)</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Add skills you can teach or want to learn. You can add more later!
+                </p>
+              </div>
               <div className="flex flex-wrap gap-2 min-h-[40px] p-3 border border-border rounded-lg bg-muted/30">
                 {skills.length === 0 ? (
                   <span className="text-sm text-muted-foreground">
