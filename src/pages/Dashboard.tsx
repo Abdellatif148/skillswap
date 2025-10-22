@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, GraduationCap, Wallet, Calendar, MessageCircle, Star, Search, Video } from "lucide-react";
+import { BookOpen, GraduationCap, Wallet, Calendar, MessageCircle, Star, Search, Video, Sparkles } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { SkillCard } from "@/components/skills/SkillCard";

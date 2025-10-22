@@ -157,26 +157,15 @@
   }
 
   /* Smooth Page Transitions */
-  .page-transition-enter {
+  .page-enter {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
 
-  .page-transition-enter-active {
+  .page-enter-active {
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 300ms ease-out, transform 300ms ease-out;
-  }
-
-  .page-transition-exit {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .page-transition-exit-active {
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 300ms ease-in, transform 300ms ease-in;
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
   }
 }
 
@@ -390,4 +379,31 @@
 :focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
+}
+
+/* iOS Safe Area */
+@supports (padding: max(0px)) {
+  .h-safe-area-inset-bottom {
+    height: max(0px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Performance optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  content-visibility: auto;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

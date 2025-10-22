@@ -1,26 +1,7 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { profileService, skillsService, Profile, Skill } from "@/lib/database";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-
-interface Profile {
-  id: string;
-  display_name: string;
-  bio: string;
-  avatar_url?: string;
-  profile_completed: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Skill {
-  id: string;
-  skill_name: string;
-  skill_type: string;
-  skill_level: string;
-  user_id: string;
-  created_at: string;
-}
 
 export const useProfile = () => {
   const { user } = useAuth();
@@ -41,43 +22,26 @@ export const useProfile = () => {
       setError(null);
 
       // Load profile
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        if (profileError.code === 'PGRST116') {
-          // Profile doesn't exist, create one
-          const { data: newProfile, error: createError } = await supabase
-            .from("profiles")
-            .insert({
-              id: user.id,
-              display_name: user.email?.split('@')[0] || 'User',
-              profile_completed: false,
-            })
-            .select()
-            .single();
-
-          if (createError) throw createError;
-          setProfile(newProfile);
-        } else {
-          throw profileError;
+      let profileData = await profileService.getProfile(user.id);
+      
+      if (!profileData) {
+        // Profile doesn't exist, create one
+        profileData = await profileService.createProfile({
+          id: user.id,
+          display_name: user.email?.split('@')[0] || 'User',
+          profile_completed: false,
+        });
+        
+        if (!profileData) {
+          throw new Error('Failed to create profile');
         }
       } else {
         setProfile(profileData);
       }
 
       // Load skills
-      const { data: skillsData, error: skillsError } = await supabase
-        .from("skills")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (skillsError) throw skillsError;
-      setSkills(skillsData || []);
+      const skillsData = await skillsService.getUserSkills(user.id);
+      setSkills(skillsData);
 
     } catch (err) {
       console.error("Error loading profile:", err);
@@ -96,12 +60,8 @@ export const useProfile = () => {
     if (!user) return false;
 
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("id", user.id);
-
-      if (error) throw error;
+      const success = await profileService.updateProfile(user.id, updates);
+      if (!success) return false;
 
       setProfile(prev => prev ? { ...prev, ...updates } : null);
       return true;
@@ -120,18 +80,14 @@ export const useProfile = () => {
     if (!user) return false;
 
     try {
-      const { data, error } = await supabase
-        .from("skills")
-        .insert({
-          ...skillData,
-          user_id: user.id,
-        })
-        .select()
-        .single();
+      const newSkill = await skillsService.addSkill({
+        ...skillData,
+        user_id: user.id,
+      });
+      
+      if (!newSkill) return false;
 
-      if (error) throw error;
-
-      setSkills(prev => [data, ...prev]);
+      setSkills(prev => [newSkill, ...prev]);
       return true;
     } catch (err) {
       console.error("Error adding skill:", err);
@@ -146,12 +102,8 @@ export const useProfile = () => {
 
   const removeSkill = async (skillId: string) => {
     try {
-      const { error } = await supabase
-        .from("skills")
-        .delete()
-        .eq("id", skillId);
-
-      if (error) throw error;
+      const success = await skillsService.removeSkill(skillId);
+      if (!success) return false;
 
       setSkills(prev => prev.filter(skill => skill.id !== skillId));
       return true;

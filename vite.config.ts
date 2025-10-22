@@ -9,6 +9,22 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          utils: ['clsx', 'tailwind-merge'],
+        },
+      },
+    },
+    sourcemap: mode === 'development',
+    minify: mode === 'production' ? 'esbuild' : false,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@supabase/supabase-js'],
+  },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {

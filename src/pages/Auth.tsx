@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { authService, profileService } from "@/lib/database";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,11 +24,7 @@ const Auth = () => {
   useEffect(() => {
     const checkProfile = async () => {
       if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("profile_completed")
-          .eq("id", user.id)
-          .single();
+        const profile = await profileService.getProfile(user.id);
 
         if (profile?.profile_completed) {
           navigate("/dashboard");
@@ -62,10 +58,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await authService.signIn(email, password);
 
         if (error) {
           if (error.message.includes("Invalid login credentials")) {
@@ -89,13 +82,7 @@ const Auth = () => {
           // Redirect will happen in useEffect after user state updates
         }
       } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/profile-setup`,
-          },
-        });
+        const { error } = await authService.signUp(email, password);
 
         if (error) {
           if (error.message.includes("already registered")) {

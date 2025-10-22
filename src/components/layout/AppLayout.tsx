@@ -71,7 +71,7 @@ export const AppLayout = ({ children, currentPage }: AppLayoutProps) => {
       <main>{children}</main>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border z-40">
         <div className="flex items-center justify-around py-3">
           <Button 
             variant="ghost" 
@@ -100,6 +100,8 @@ export const AppLayout = ({ children, currentPage }: AppLayoutProps) => {
             </Avatar>
           </Button>
         </div>
+        {/* Safe area for iOS */}
+        <div className="h-safe-area-inset-bottom"></div>
       </div>
     </div>
   );

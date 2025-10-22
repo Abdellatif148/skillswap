@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { profileService, skillsService } from "@/lib/database";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,50 +9,20 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Plus, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { profileSetupSchema, skillSchema } from "@/lib/validations";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-interface Skill {
-  name: string;
-  level: string;
-  type: "teach" | "learn";
-}
+import { SkillForm, SkillFormData } from "@/components/forms/SkillForm";
 
 const ProfileSetup = () => {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [currentSkill, setCurrentSkill] = useState("");
-  const [currentLevel, setCurrentLevel] = useState("beginner");
-  const [currentType, setCurrentType] = useState<"teach" | "learn">("teach");
+  const [skills, setSkills] = useState<SkillFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const addSkill = () => {
-    if (!currentSkill.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a skill name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSkills([
-      ...skills,
-      { name: currentSkill, level: currentLevel, type: currentType },
-    ]);
-    setCurrentSkill("");
-    setCurrentLevel("beginner");
+  const handleAddSkill = (skill: SkillFormData) => {
+    setSkills([...skills, skill]);
   };
 
   const removeSkill = (index: number) => {
@@ -78,34 +48,24 @@ const ProfileSetup = () => {
 
     try {
       // Update profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          display_name: displayName,
-          bio: bio,
-          profile_completed: true,
-        })
-        .eq("id", user?.id);
-
-      if (profileError) throw profileError;
+      const success = await profileService.updateProfile(user?.id!, {
+        display_name: displayName,
+        bio: bio,
+        profile_completed: true,
+      });
+      
+      if (!success) throw new Error("Failed to update profile");
 
       // Insert skills if any were added
       if (skills.length > 0) {
-        // Delete any existing skills first
-        await supabase.from("skills").delete().eq("user_id", user?.id);
-
-        const skillsData = skills.map((skill) => ({
-          user_id: user?.id,
-          skill_name: skill.name,
-          skill_type: skill.type,
-          skill_level: skill.level,
-        }));
-
-        const { error: skillsError } = await supabase
-          .from("skills")
-          .insert(skillsData);
-
-        if (skillsError) throw skillsError;
+        for (const skill of skills) {
+          await skillsService.addSkill({
+            user_id: user?.id!,
+            skill_name: skill.name,
+            skill_type: skill.type,
+            skill_level: skill.level,
+          });
+        }
       }
 
       toast({
@@ -163,89 +123,12 @@ const ProfileSetup = () => {
               />
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Label>Your Skills (Optional)</Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Add skills you can teach or want to learn. You can add more later!
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[40px] p-3 border border-border rounded-lg bg-muted/30">
-                {skills.length === 0 ? (
-                  <span className="text-sm text-muted-foreground">
-                    No skills added yet
-                  </span>
-                ) : (
-                  skills.map((skill, index) => (
-                    <Badge
-                      key={index}
-                      variant={skill.type === "teach" ? "default" : "secondary"}
-                      className="gap-1"
-                    >
-                      {skill.name} ({skill.level}) - {skill.type}
-                      <button
-                        type="button"
-                        onClick={() => removeSkill(index)}
-                        className="ml-1 hover:bg-background/20 rounded-full p-0.5"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div className="md:col-span-2">
-                  <Input
-                    placeholder="Skill name (e.g., Web Design)"
-                    value={currentSkill}
-                    onChange={(e) => setCurrentSkill(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
-                <Select
-                  value={currentLevel}
-                  onValueChange={setCurrentLevel}
-                  disabled={loading}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
-                    <SelectItem value="expert">Expert</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={currentType}
-                  onValueChange={(value: "teach" | "learn") =>
-                    setCurrentType(value)
-                  }
-                  disabled={loading}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="teach">Can Teach</SelectItem>
-                    <SelectItem value="learn">Want to Learn</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button
-                type="button"
-                onClick={addSkill}
-                variant="outline"
-                className="w-full"
-                disabled={loading}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Skill
-              </Button>
-            </div>
+            <SkillForm
+              onAddSkill={handleAddSkill}
+              skills={skills}
+              onRemoveSkill={removeSkill}
+              disabled={loading}
+            />
 
             <Button
               type="submit"
