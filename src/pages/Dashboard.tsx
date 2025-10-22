@@ -6,18 +6,24 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, GraduationCap, Wallet, Calendar, MessageCircle, Star, Search, Video, Sparkles } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { SkillCard } from "@/components/skills/SkillCard";
 import { useProfile } from "@/hooks/useProfile";
+import { useMatches } from "@/hooks/useMatches";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { profile, skills, loading, teachSkills, learnSkills } = useProfile();
+  const { matches, loading: matchesLoading } = useMatches();
   const [activeTab, setActiveTab] = useState("teach");
 
   if (loading) {
-    return <LoadingSpinner size="lg" />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading your dashboard..." />
+      </div>
+    );
   }
 
   if (!profile?.profile_completed) {
@@ -25,12 +31,7 @@ const Dashboard = () => {
     return null;
   }
 
-  // Mock data for matches
-  const mockMatches = [
-    { id: 1, name: "Sarah Chen", skill: "Design ↔ Guitar", rating: 4.8, avatar: "" },
-    { id: 2, name: "Alex Kumar", skill: "Python ↔ Marketing", rating: 4.9, avatar: "" },
-    { id: 3, name: "Maria Lopez", skill: "Spanish ↔ Photography", rating: 5.0, avatar: "" },
-  ];
+  const displayMatches = matches.slice(0, 3); // Show only first 3 matches
 
   return (
     <AppLayout currentPage="dashboard">
@@ -136,23 +137,41 @@ const Dashboard = () => {
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockMatches.map((match) => (
-                <Card key={match.id} className="p-4 bg-gradient-card hover:shadow-soft transition-all cursor-pointer">
+              {matchesLoading ? (
+                <div className="col-span-full">
+                  <LoadingSpinner size="md" text="Loading matches..." />
+                </div>
+              ) : displayMatches.length === 0 ? (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-muted-foreground">No matches yet. Add more skills to find partners!</p>
+                </div>
+              ) : (
+                displayMatches.map((match) => {
+                  const otherUser = match.teacher_id === profile?.id 
+                    ? match.learner_profile 
+                    : match.teacher_profile;
+                  const teacherSkill = match.teacher_skill?.skill_name;
+                  const learnerSkill = match.learner_skill?.skill_name;
+                  
+                  return (
+                    <Card key={match.id} className="p-4 bg-gradient-card hover:shadow-soft transition-all cursor-pointer">
                   <div className="flex items-start gap-3 mb-3">
                     <Avatar className="h-12 w-12">
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {match.name.charAt(0)}
+                        {otherUser?.display_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{match.name}</h3>
+                      <h3 className="font-semibold text-foreground">{otherUser?.display_name || 'Unknown User'}</h3>
                       <div className="flex items-center gap-1 mt-1">
                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium text-foreground">{match.rating}</span>
+                        <span className="text-sm font-medium text-foreground">4.8</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">{match.skill}</p>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {teacherSkill} ↔ {learnerSkill}
+                  </p>
                   <div className="flex gap-2">
                     <Button size="sm" className="flex-1" onClick={() => navigate("/messages")}>
                       <MessageCircle className="w-4 h-4 mr-1" />
@@ -163,7 +182,9 @@ const Dashboard = () => {
                     </Button>
                   </div>
                 </Card>
-              ))}
+                  );
+                })
+              )}
             </div>
           </Card>
 

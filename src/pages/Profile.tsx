@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { MapPin, Globe, Star, GraduationCap, BookOpen, Award, Calendar, Clock, MessageCircle, Video, Edit } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useProfile } from "@/hooks/useProfile";
 
 const Profile = () => {
@@ -14,7 +14,11 @@ const Profile = () => {
   const { profile, skills, loading, teachSkills, learnSkills } = useProfile();
 
   if (loading) {
-    return <LoadingSpinner size="lg" />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading profile..." />
+      </div>
+    );
   }
 
   const milestones = [

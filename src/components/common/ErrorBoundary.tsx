@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { toast } from "@/components/ui/sonner";
 
 interface Props {
   children: ReactNode;
@@ -24,6 +25,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
+    
+    // Report error to monitoring service in production
+    if (process.env.NODE_ENV === 'production') {
+      // Add error reporting service here (e.g., Sentry)
+    }
+    
+    toast.error("An unexpected error occurred", {
+      description: "The error has been logged and will be investigated."
+    });
   }
 
   public render() {

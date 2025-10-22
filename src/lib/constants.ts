@@ -66,9 +66,71 @@ export const LIMITS = {
 
 // Popular skills for suggestions
 export const POPULAR_SKILLS = [
-  "Python", "JavaScript", "React", "Node.js", "UI/UX Design",
-  "Guitar", "Piano", "Spanish", "French", "German",
-  "Photography", "Video Editing", "Graphic Design", "Marketing",
-  "Data Science", "Machine Learning", "Cooking", "Yoga",
-  "Public Speaking", "Writing", "Drawing", "Painting"
+  // Technology
+  "Python", "JavaScript", "React", "Node.js", "TypeScript", "Vue.js", "Angular",
+  "Data Science", "Machine Learning", "AI/ML", "Blockchain", "Cybersecurity",
+  "Mobile Development", "Web Development", "DevOps", "Cloud Computing",
+  
+  // Design & Creative
+  "UI/UX Design", "Graphic Design", "Web Design", "Logo Design", "Branding",
+  "Photography", "Video Editing", "Animation", "3D Modeling", "Illustration",
+  "Drawing", "Painting", "Digital Art", "Adobe Creative Suite",
+  
+  // Languages
+  "Spanish", "French", "German", "Italian", "Portuguese", "Mandarin",
+  "Japanese", "Korean", "Arabic", "Russian", "English (ESL)",
+  
+  // Music & Arts
+  "Guitar", "Piano", "Violin", "Drums", "Singing", "Music Production",
+  "Songwriting", "Music Theory", "DJ Skills", "Sound Engineering",
+  
+  // Business & Marketing
+  "Digital Marketing", "Social Media Marketing", "SEO", "Content Marketing",
+  "Email Marketing", "Sales", "Business Strategy", "Entrepreneurship",
+  "Project Management", "Leadership", "Public Speaking", "Presentation Skills",
+  
+  // Health & Fitness
+  "Yoga", "Meditation", "Personal Training", "Nutrition", "Pilates",
+  "Running", "Weight Training", "Mental Health", "Wellness Coaching",
+  
+  // Life Skills
+  "Cooking", "Baking", "Gardening", "Home Improvement", "Financial Planning",
+  "Time Management", "Organization", "Study Skills", "Writing", "Reading",
+  
+  // Hobbies & Crafts
+  "Knitting", "Sewing", "Woodworking", "Pottery", "Jewelry Making",
+  "Origami", "Calligraphy", "Chess", "Board Games", "Card Games"
 ] as const;
+
+// Skill categories for organization
+export const SKILL_CATEGORIES = [
+  { id: "technology", name: "Technology & Programming", icon: "💻" },
+  { id: "design", name: "Design & Creative", icon: "🎨" },
+  { id: "languages", name: "Languages", icon: "🌍" },
+  { id: "music", name: "Music & Arts", icon: "🎵" },
+  { id: "business", name: "Business & Marketing", icon: "💼" },
+  { id: "health", name: "Health & Fitness", icon: "💪" },
+  { id: "life", name: "Life Skills", icon: "🏠" },
+  { id: "hobbies", name: "Hobbies & Crafts", icon: "🎯" },
+] as const;
+
+// API endpoints (for future use)
+export const API_ENDPOINTS = {
+  profiles: "/api/profiles",
+  skills: "/api/skills",
+  matches: "/api/matches",
+  messages: "/api/messages",
+  sessions: "/api/sessions",
+  reviews: "/api/reviews",
+  notifications: "/api/notifications",
+} as const;
+
+// Feature flags
+export const FEATURES = {
+  videoChat: true,
+  fileSharing: true,
+  skillRecommendations: true,
+  aiAssistant: true,
+  gamification: false, // Coming soon
+  premiumFeatures: false, // Coming soon
+} as const;

@@ -6,52 +6,34 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Paperclip, Video, Phone, MoreVertical, Search, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AppLayout } from "@/components/layout/AppLayout";
-
-interface ChatContact {
-  id: number;
-  name: string;
-  lastMessage: string;
-  timestamp: string;
-  unread: boolean;
-  avatar?: string;
-  online: boolean;
-}
-
-interface Message {
-  id: number;
-  text: string;
-  timestamp: string;
-  sender: "me" | "other";
-  read: boolean;
-}
+import { useMessages } from "@/hooks/useMessages";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { formatRelativeTime } from "@/lib/utils";
 
 const Messages = () => {
-  const [selectedChat, setSelectedChat] = useState<number>(1);
+  const [selectedMatchId, setSelectedMatchId] = useState<string>("");
   const [messageText, setMessageText] = useState("");
+  
+  const { conversations, loading: conversationsLoading } = useMessages();
+  const { messages, loading: messagesLoading, sendMessage } = useMessages(selectedMatchId);
 
-  const contacts: ChatContact[] = [
-    { id: 1, name: "Sarah Chen", lastMessage: "Great session today!", timestamp: "2m ago", unread: true, online: true },
-    { id: 2, name: "Alex Kumar", lastMessage: "When can we schedule next?", timestamp: "1h ago", unread: false, online: true },
-    { id: 3, name: "Maria Lopez", lastMessage: "Thanks for the tips!", timestamp: "3h ago", unread: false, online: false },
-    { id: 4, name: "John Smith", lastMessage: "See you tomorrow!", timestamp: "1d ago", unread: false, online: false },
-  ];
+  const selectedConversation = conversations.find(c => c.match_id === selectedMatchId);
 
-  const messages: Message[] = [
-    { id: 1, text: "Hi! Ready for our design session?", timestamp: "10:30 AM", sender: "other", read: true },
-    { id: 2, text: "Yes! I'm excited to learn about UI design principles.", timestamp: "10:32 AM", sender: "me", read: true },
-    { id: 3, text: "Perfect! Let me share some resources first.", timestamp: "10:33 AM", sender: "other", read: true },
-    { id: 4, text: "Great session today! Really learned a lot about color theory.", timestamp: "11:45 AM", sender: "me", read: true },
-    { id: 5, text: "I'm glad! You're making great progress. Same time next week?", timestamp: "11:47 AM", sender: "other", read: true },
-  ];
-
-  const selectedContact = contacts.find(c => c.id === selectedChat);
-
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (messageText.trim()) {
-      // Handle sending message
-      setMessageText("");
+      const success = await sendMessage(selectedMatchId, messageText);
+      if (success) {
+        setMessageText("");
+      }
     }
   };
+
+  // Select first conversation by default
+  React.useEffect(() => {
+    if (conversations.length > 0 && !selectedMatchId) {
+      setSelectedMatchId(conversations[0].match_id);
+    }
+  }, [conversations, selectedMatchId]);
 
   return (
     <AppLayout currentPage="messages">
@@ -71,13 +53,20 @@ const Messages = () => {
             </div>
 
             <ScrollArea className="flex-1 -mx-4 px-4">
+              {conversationsLoading ? (
+                <LoadingSpinner size="md" text="Loading conversations..." />
+              ) : conversations.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No conversations yet</p>
+                </div>
+              ) : (
               <div className="space-y-2">
-                {contacts.map((contact) => (
+                {conversations.map((conversation) => (
                   <div
-                    key={contact.id}
-                    onClick={() => setSelectedChat(contact.id)}
+                    key={conversation.match_id}
+                    onClick={() => setSelectedMatchId(conversation.match_id)}
                     className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                      selectedChat === contact.id
+                      selectedMatchId === conversation.match_id
                         ? "bg-primary/10 border border-primary/20"
                         : "hover:bg-muted"
                     }`}
@@ -86,33 +75,42 @@ const Messages = () => {
                       <div className="relative">
                         <Avatar className="h-12 w-12">
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {contact.name.charAt(0)}
+                            {conversation.other_user.display_name?.charAt(0) || 'U'}
                           </AvatarFallback>
                         </Avatar>
-                        {contact.online && (
+                        {/* Always show as online for now */}
+                        {true && (
                           <span className="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-background"></span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <h3 className="font-semibold text-foreground text-sm truncate">
-                            {contact.name}
+                            {conversation.other_user.display_name}
                           </h3>
-                          <span className="text-xs text-muted-foreground">{contact.timestamp}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {conversation.last_message 
+                              ? formatRelativeTime(conversation.last_message.created_at)
+                              : 'No messages'
+                            }
+                          </span>
                         </div>
                         <p className={`text-sm truncate ${
-                          contact.unread ? "text-foreground font-medium" : "text-muted-foreground"
+                          conversation.unread_count > 0 ? "text-foreground font-medium" : "text-muted-foreground"
                         }`}>
-                          {contact.lastMessage}
+                          {conversation.last_message?.content || 'Start a conversation'}
                         </p>
                       </div>
-                      {contact.unread && (
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      {conversation.unread_count > 0 && (
+                        <div className="min-w-[20px] h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                          {conversation.unread_count}
+                        </div>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
+              )}
             </ScrollArea>
           </Card>
 
@@ -123,13 +121,15 @@ const Messages = () => {
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                    {selectedContact?.name.charAt(0)}
+                    {selectedConversation?.other_user.display_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-semibold text-foreground">{selectedContact?.name}</h3>
+                  <h3 className="font-semibold text-foreground">
+                    {selectedConversation?.other_user.display_name || 'Select a conversation'}
+                  </h3>
                   <p className="text-xs text-muted-foreground">
-                    {selectedContact?.online ? "Online" : "Offline"}
+                    Online
                   </p>
                 </div>
               </div>
@@ -148,31 +148,38 @@ const Messages = () => {
 
             {/* Messages Area */}
             <ScrollArea className="flex-1 p-4">
+              {!selectedMatchId ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">Select a conversation to start messaging</p>
+                </div>
+              ) : messagesLoading ? (
+                <LoadingSpinner size="md" text="Loading messages..." />
+              ) : (
               <div className="space-y-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex ${message.sender === "me" ? "justify-end" : "justify-start"}`}
+                    className={`flex ${message.sender_id === selectedConversation?.other_user.id ? "justify-start" : "justify-end"}`}
                   >
                     <div
                       className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                        message.sender === "me"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-foreground"
+                        message.sender_id === selectedConversation?.other_user.id
+                          ? "bg-muted text-foreground"
+                          : "bg-primary text-primary-foreground"
                       }`}
                     >
-                      <p className="text-sm">{message.text}</p>
+                      <p className="text-sm">{message.content}</p>
                       <div className="flex items-center justify-end gap-1 mt-1">
                         <span
                           className={`text-xs ${
-                            message.sender === "me"
-                              ? "text-primary-foreground/70"
-                              : "text-muted-foreground"
+                            message.sender_id === selectedConversation?.other_user.id
+                              ? "text-muted-foreground"
+                              : "text-primary-foreground/70"
                           }`}
                         >
-                          {message.timestamp}
+                          {formatRelativeTime(message.created_at)}
                         </span>
-                        {message.sender === "me" && message.read && (
+                        {message.sender_id !== selectedConversation?.other_user.id && message.read_at && (
                           <span className="text-xs text-primary-foreground/70">✓✓</span>
                         )}
                       </div>
@@ -180,17 +187,21 @@ const Messages = () => {
                   </div>
                 ))}
               </div>
+              )}
             </ScrollArea>
 
             {/* AI Assistant Suggestion */}
-            <div className="px-4 py-2 bg-primary/5 border-t border-border">
+            {selectedMatchId && (
+              <div className="px-4 py-2 bg-primary/5 border-t border-border">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <span>AI suggests: "How about scheduling a follow-up session?"</span>
               </div>
             </div>
+            )}
 
             {/* Message Input */}
+            {selectedMatchId && (
             <div className="p-4 border-t border-border bg-gradient-card">
               <div className="flex items-center gap-2">
                 <Button size="icon" variant="ghost">
@@ -212,6 +223,7 @@ const Messages = () => {
                 </Button>
               </div>
             </div>
+            )}
           </Card>
         </div>
       </div>

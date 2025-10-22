@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader as Loader2, Plus, X } from "lucide-react";
-import { profileSetupSchema, skillSchema } from "@/lib/validations";
+import { profileSetupSchema } from "@/lib/validations";
 import { SkillForm, SkillFormData } from "@/components/forms/SkillForm";
 
 const ProfileSetup = () => {
@@ -32,13 +32,22 @@ const ProfileSetup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!displayName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Display name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate profile data
     try {
       profileSetupSchema.parse({ display_name: displayName, bio });
     } catch (error) {
       toast({
         title: "Validation Error",
-        description: "Please check your input",
+        description: "Please check your profile information",
         variant: "destructive",
       });
       return;
@@ -50,7 +59,7 @@ const ProfileSetup = () => {
       // Update profile
       const success = await profileService.updateProfile(user?.id!, {
         display_name: displayName,
-        bio: bio,
+        bio: bio || null,
         profile_completed: true,
       });
       

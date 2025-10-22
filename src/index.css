@@ -125,6 +125,9 @@
   body {
     @apply bg-background text-foreground font-inter;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-display: swap;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Typography Scale */
@@ -154,6 +157,23 @@
 
   p {
     @apply text-base leading-relaxed;
+  }
+
+  /* Focus styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  /* Reduced motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   /* Smooth Page Transitions */
@@ -203,6 +223,26 @@
   .card-interactive {
     @apply card-modern cursor-pointer;
     @apply hover:border-primary/20 hover:shadow-hover;
+  }
+
+  /* Loading States */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  .loading-shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .loading-shimmer::after {
+    @apply absolute inset-0;
+    content: '';
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.4) 50%, 
+      transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
   }
 
   /* Loading Shimmer Effect */
@@ -343,6 +383,18 @@
     @apply w-4 h-4 bg-secondary rounded-full;
     @apply border-2 border-white;
   }
+
+  /* Responsive utilities */
+  .container-responsive {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+  }
 }
 
 /* Font Family */
@@ -375,12 +427,6 @@
   color: hsl(var(--primary));
 }
 
-/* Focus Visible */
-:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-}
-
 /* iOS Safe Area */
 @supports (padding: max(0px)) {
   .h-safe-area-inset-bottom {
@@ -397,13 +443,10 @@ img {
   content-visibility: auto;
 }
 
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
   }
 }

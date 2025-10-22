@@ -5,6 +5,32 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Performance utilities
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}
+
 // Format date utilities
 export function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -37,6 +63,27 @@ export function formatRelativeTime(date: string | Date): string {
   return formatDate(date);
 }
 
+// Time utilities
+export function formatDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  
+  if (hours === 0) return `${mins}m`;
+  if (mins === 0) return `${hours}h`;
+  return `${hours}h ${mins}m`;
+}
+
+export function getTimeUntil(date: string | Date): string {
+  const target = new Date(date);
+  const now = new Date();
+  const diffInMinutes = Math.floor((target.getTime() - now.getTime()) / (1000 * 60));
+  
+  if (diffInMinutes < 0) return 'Past due';
+  if (diffInMinutes < 60) return `${diffInMinutes}m`;
+  if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
+  return `${Math.floor(diffInMinutes / 1440)}d`;
+}
+
 // String utilities
 export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
@@ -45,6 +92,18 @@ export function truncate(str: string, length: number): string {
 
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function generateId(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
 // Array utilities
@@ -61,6 +120,35 @@ export function shuffle<T>(array: T[]): T[] {
   return shuffled;
 }
 
+export function groupBy<T, K extends keyof any>(
+  array: T[],
+  key: (item: T) => K
+): Record<K, T[]> {
+  return array.reduce((groups, item) => {
+    const group = key(item);
+    groups[group] = groups[group] || [];
+    groups[group].push(item);
+    return groups;
+  }, {} as Record<K, T[]>);
+}
+
+export function sortBy<T>(
+  array: T[],
+  key: keyof T | ((item: T) => any),
+  direction: 'asc' | 'desc' = 'asc'
+): T[] {
+  const getValue = typeof key === 'function' ? key : (item: T) => item[key];
+  
+  return [...array].sort((a, b) => {
+    const aVal = getValue(a);
+    const bVal = getValue(b);
+    
+    if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
 // Validation utilities
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -74,6 +162,54 @@ export function isValidUrl(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function isValidPassword(password: string): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+  
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+  
+  if (!/\d/.test(password)) {
+    errors.push('Password must contain at least one number');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+// File utilities
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+export function getFileExtension(filename: string): string {
+  return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
+}
+
+export function isImageFile(filename: string): boolean {
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  return imageExtensions.includes(getFileExtension(filename).toLowerCase());
 }
 
 // Local storage utilities
@@ -100,4 +236,44 @@ export function removeFromStorage(key: string): void {
   } catch (error) {
     console.error('Failed to remove from localStorage:', error);
   }
+}
+
+// Color utilities
+export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+export function rgbToHex(r: number, g: number, b: number): string {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+// URL utilities
+export function getQueryParams(): Record<string, string> {
+  const params = new URLSearchParams(window.location.search);
+  const result: Record<string, string> = {};
+  
+  for (const [key, value] of params) {
+    result[key] = value;
+  }
+  
+  return result;
+}
+
+export function updateQueryParams(params: Record<string, string | null>): void {
+  const url = new URL(window.location.href);
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === null) {
+      url.searchParams.delete(key);
+    } else {
+      url.searchParams.set(key, value);
+    }
+  });
+  
+  window.history.replaceState({}, '', url.toString());
 }
