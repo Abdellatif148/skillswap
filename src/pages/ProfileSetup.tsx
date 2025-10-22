@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader as Loader2, Plus, X } from "lucide-react";
 import { profileSetupSchema, skillSchema } from "@/lib/validations";
 import { SkillForm, SkillFormData } from "@/components/forms/SkillForm";
 
