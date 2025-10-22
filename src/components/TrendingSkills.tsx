@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Code, Guitar, Video, Palette, Globe, Camera, Mic, Briefcase, Heart } from "lucide-react";
 
 const trendingSkills = [
