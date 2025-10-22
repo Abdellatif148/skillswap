@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, Send, Paperclip, Video, Phone, MoreVertical, Search, MessageCircle, Bell } from "lucide-react";
+import { Send, Paperclip, Video, Phone, MoreVertical, Search, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 interface ChatContact {
   id: number;
@@ -26,7 +26,6 @@ interface Message {
 }
 
 const Messages = () => {
-  const navigate = useNavigate();
   const [selectedChat, setSelectedChat] = useState<number>(1);
   const [messageText, setMessageText] = useState("");
 
@@ -55,38 +54,7 @@ const Messages = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
-                <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center shadow-soft">
-                  <Sparkles className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <span className="text-xl font-bold text-foreground">SkillSwap</span>
-              </div>
-              <div className="hidden md:flex items-center gap-4">
-                <Button variant="ghost" onClick={() => navigate("/dashboard")}>Dashboard</Button>
-                <Button variant="ghost" className="text-primary">Messages</Button>
-                <Button variant="ghost" onClick={() => navigate("/profile")}>Profile</Button>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
-              </Button>
-              <Avatar className="h-9 w-9 cursor-pointer" onClick={() => navigate("/profile")}>
-                <AvatarFallback className="bg-primary text-primary-foreground">U</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Messages Layout */}
+    <AppLayout currentPage="messages">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-120px)]">
           {/* Chat List */}
@@ -247,27 +215,7 @@ const Messages = () => {
           </Card>
         </div>
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border">
-        <div className="flex items-center justify-around py-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
-            <Sparkles className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm">
-            <MessageCircle className="h-5 w-5 text-primary" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">U</AvatarFallback>
-            </Avatar>
-          </Button>
-        </div>
-      </div>
-    </div>
+    </AppLayout>
   );
 };
 

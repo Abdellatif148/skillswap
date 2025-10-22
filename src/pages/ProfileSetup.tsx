@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { profileSetupSchema, skillSchema } from "@/lib/validations";
 import {
   Select,
   SelectContent,
@@ -61,10 +62,13 @@ const ProfileSetup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!displayName.trim()) {
+    // Validate profile data
+    try {
+      profileSetupSchema.parse({ display_name: displayName, bio });
+    } catch (error) {
       toast({
         title: "Validation Error",
-        description: "Please enter your display name",
+        description: "Please check your input",
         variant: "destructive",
       });
       return;

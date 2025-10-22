@@ -1,89 +1,21 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Sparkles, MapPin, Globe, Star, GraduationCap, BookOpen, Award, Calendar, Clock, MessageCircle, Video, Edit, Bell, Search, LogOut } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
-interface Profile {
-  display_name: string;
-  bio: string;
-  avatar_url?: string;
-}
-
-interface Skill {
-  id: string;
-  skill_name: string;
-  skill_type: string;
-  skill_level: string;
-}
+import { MapPin, Globe, Star, GraduationCap, BookOpen, Award, Calendar, Clock, MessageCircle, Video, Edit } from "lucide-react";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { useProfile } from "@/hooks/useProfile";
 
 const Profile = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    loadProfile();
-  }, [user, navigate]);
-
-  const loadProfile = async () => {
-    try {
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-      setProfile(profileData);
-
-      const { data: skillsData, error: skillsError } = await supabase
-        .from("skills")
-        .select("*")
-        .eq("user_id", user?.id);
-
-      if (skillsError) throw skillsError;
-      setSkills(skillsData || []);
-    } catch (error) {
-      console.error("Error loading profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
+  const { profile, skills, loading, teachSkills, learnSkills } = useProfile();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" />;
   }
-
-  const teachSkills = skills.filter((s) => s.skill_type === "teach");
-  const learnSkills = skills.filter((s) => s.skill_type === "learn");
 
   const milestones = [
     { id: 1, title: "Completed 5 sessions in Design", date: "2 weeks ago", icon: GraduationCap },
@@ -92,41 +24,7 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
-                <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center shadow-soft">
-                  <Sparkles className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <span className="text-xl font-bold text-foreground">SkillSwap</span>
-              </div>
-              <div className="hidden md:flex items-center gap-4">
-                <Button variant="ghost" onClick={() => navigate("/dashboard")}>Dashboard</Button>
-                <Button variant="ghost" onClick={() => navigate("/messages")}>Messages</Button>
-                <Button variant="ghost" className="text-primary">Profile</Button>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
-              </Button>
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {profile?.display_name?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Profile Content */}
+    <AppLayout currentPage="profile">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto space-y-6">
           {/* Profile Header */}
@@ -316,29 +214,7 @@ const Profile = () => {
           </Card>
         </div>
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border">
-        <div className="flex items-center justify-around py-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
-            <Sparkles className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/messages")}>
-            <MessageCircle className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                {profile?.display_name?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          </Button>
-        </div>
-      </div>
-    </div>
+    </AppLayout>
   );
 };
 

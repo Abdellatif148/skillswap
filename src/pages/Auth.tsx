@@ -7,14 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Loader2 } from "lucide-react";
-import { z } from "zod";
+import { authSchema } from "@/lib/validations";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-
-const authSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -52,10 +47,11 @@ const Auth = () => {
     try {
       authSchema.parse({ email, password });
     } catch (error) {
-      if (error instanceof z.ZodError) {
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as any;
         toast({
           title: "Validation Error",
-          description: error.errors[0].message,
+          description: zodError.errors[0]?.message || "Invalid input",
           variant: "destructive",
         });
         return;
