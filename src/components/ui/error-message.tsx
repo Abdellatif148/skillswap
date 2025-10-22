@@ -9,6 +9,7 @@ interface ErrorMessageProps {
   onRetry?: () => void;
   className?: string;
   variant?: "default" | "destructive" | "minimal";
+  showIcon?: boolean;
 }
 
 export const ErrorMessage = ({
@@ -16,12 +17,13 @@ export const ErrorMessage = ({
   message,
   onRetry,
   className,
-  variant = "default"
+  variant = "default",
+  showIcon = true
 }: ErrorMessageProps) => {
   if (variant === "minimal") {
     return (
       <div className={cn("flex items-center gap-2 text-destructive text-sm", className)}>
-        <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+        {showIcon && <AlertTriangle className="h-4 w-4 flex-shrink-0" />}
         <span>{message}</span>
         {onRetry && (
           <Button
@@ -43,10 +45,10 @@ export const ErrorMessage = ({
       variant === "destructive" && "border-destructive/50 bg-destructive/5",
       className
     )}>
-      <AlertTriangle className={cn(
+      {showIcon && <AlertTriangle className={cn(
         "h-12 w-12 mx-auto mb-4",
         variant === "destructive" ? "text-destructive" : "text-muted-foreground"
-      )} />
+      )} />}
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground mb-4">{message}</p>
       {onRetry && (

@@ -8,12 +8,18 @@ export function cn(...inputs: ClassValue[]) {
 // Performance utilities
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
+  immediate?: boolean
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
   return (...args: Parameters<T>) => {
+    const callNow = immediate && !timeout;
     clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
+    timeout = setTimeout(() => {
+      timeout = null!;
+      if (!immediate) func(...args);
+    }, wait);
+    if (callNow) func(...args);
   };
 }
 
@@ -151,7 +157,7 @@ export function sortBy<T>(
 
 // Validation utilities
 export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return emailRegex.test(email);
 }
 
@@ -167,29 +173,50 @@ export function isValidUrl(url: string): boolean {
 export function isValidPassword(password: string): {
   isValid: boolean;
   errors: string[];
+  strength: 'weak' | 'medium' | 'strong';
 } {
   const errors: string[] = [];
+  let score = 0;
   
   if (password.length < 8) {
     errors.push('Password must be at least 8 characters long');
+  } else {
+    score += 1;
   }
   
   if (!/[A-Z]/.test(password)) {
     errors.push('Password must contain at least one uppercase letter');
+  } else {
+    score += 1;
   }
   
   if (!/[a-z]/.test(password)) {
     errors.push('Password must contain at least one lowercase letter');
+  } else {
+    score += 1;
   }
   
   if (!/\d/.test(password)) {
     errors.push('Password must contain at least one number');
+  } else {
+    score += 1;
   }
+  
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    // Optional special character for stronger password
+  } else {
+    score += 1;
+  }
+  
+  let strength: 'weak' | 'medium' | 'strong' = 'weak';
+  if (score >= 4) strength = 'strong';
+  else if (score >= 3) strength = 'medium';
   
   return {
     isValid: errors.length === 0,
     errors,
-  };
+    strength,
+  }
 }
 
 // File utilities
@@ -252,6 +279,14 @@ export function rgbToHex(r: number, g: number, b: number): string {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
+export function getContrastColor(hexColor: string): string {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) return '#000000';
+  
+  const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+  return brightness > 128 ? '#000000' : '#ffffff';
+}
+
 // URL utilities
 export function getQueryParams(): Record<string, string> {
   const params = new URLSearchParams(window.location.search);
@@ -276,4 +311,47 @@ export function updateQueryParams(params: Record<string, string | null>): void {
   });
   
   window.history.replaceState({}, '', url.toString());
+}
+// Error handling utilities
+export function handleAsyncError<T>(
+  asyncFn: () => Promise<T>,
+  fallback?: T
+): Promise<T | undefined> {
+  return asyncFn().catch((error) => {
+    console.error('Async operation failed:', error);
+    return fallback;
+  });
+}
+
+export function retry<T>(
+  fn: () => Promise<T>,
+  retries: number = 3,
+  delay: number = 1000
+): Promise<T> {
+  return fn().catch((error) => {
+    if (retries > 0) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(retry(fn, retries - 1, delay));
+        }, delay);
+      });
+    }
+    throw error;
+  });
+}
+
+// Performance utilities
+export function measurePerformance<T>(
+  fn: () => T,
+  label?: string
+): T {
+  const start = performance.now();
+  const result = fn();
+  const end = performance.now();
+  
+  if (label) {
+    console.log(`${label} took ${end - start} milliseconds`);
+  }
+  
+  return result;
 }

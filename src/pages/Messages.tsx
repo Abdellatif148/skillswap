@@ -29,7 +29,7 @@ const Messages = () => {
   };
 
   // Select first conversation by default
-  React.useEffect(() => {
+  useEffect(() => {
     if (conversations.length > 0 && !selectedMatchId) {
       setSelectedMatchId(conversations[0].match_id);
     }

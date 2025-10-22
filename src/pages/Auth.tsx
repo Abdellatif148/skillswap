@@ -10,6 +10,7 @@ import { Sparkles, Loader as Loader2 } from "lucide-react";
 import { authSchema } from "@/lib/validations";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,6 +20,28 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Check for pre-selected skill or search query
+  useEffect(() => {
+    const selectedSkill = localStorage.getItem('selectedSkill');
+    const searchQuery = localStorage.getItem('searchQuery');
+    
+    if (selectedSkill || searchQuery) {
+      // Show a message about the selected skill
+      const skill = selectedSkill ? JSON.parse(selectedSkill) : null;
+      if (skill) {
+        toast({
+          title: "Ready to learn?",
+          description: `Sign up to start learning ${skill.name}!`,
+        });
+      } else if (searchQuery) {
+        toast({
+          title: "Join SkillSwap",
+          description: `Sign up to explore "${searchQuery}" and more!`,
+        });
+      }
+    }
+  }, [toast]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -75,6 +98,10 @@ const Auth = () => {
             });
           }
         } else {
+          // Clear any stored skill selection after successful login
+          localStorage.removeItem('selectedSkill');
+          localStorage.removeItem('searchQuery');
+          
           toast({
             title: "Welcome back!",
             description: "Successfully logged in",
@@ -99,6 +126,10 @@ const Auth = () => {
             });
           }
         } else {
+          // Clear any stored skill selection after successful signup
+          localStorage.removeItem('selectedSkill');
+          localStorage.removeItem('searchQuery');
+          
           toast({
             title: "Account created!",
             description: "Please check your email to verify your account",
@@ -116,10 +147,36 @@ const Auth = () => {
     }
   };
 
+  // Get selected skill info for display
+  const selectedSkill = localStorage.getItem('selectedSkill') 
+    ? JSON.parse(localStorage.getItem('selectedSkill')!) 
+    : null;
+  const searchQuery = localStorage.getItem('searchQuery');
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8 space-y-6 shadow-soft">
         <div className="text-center space-y-2">
+          {/* Show selected skill or search query */}
+          {(selectedSkill || searchQuery) && (
+            <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/20">
+              {selectedSkill ? (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Ready to learn</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <Badge variant="outline">{selectedSkill.name}</Badge>
+                    <span className="text-xs">{selectedSkill.category?.icon}</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Searching for</p>
+                  <Badge variant="outline">"{searchQuery}"</Badge>
+                </div>
+              )}
+            </div>
+          )}
+          
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-hero flex items-center justify-center shadow-soft">
               <Sparkles className="w-6 h-6 text-primary-foreground" />

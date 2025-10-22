@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Loader as Loader2, Plus, X } from "lucide-react";
 import { profileSetupSchema } from "@/lib/validations";
 import { SkillForm, SkillFormData } from "@/components/forms/SkillForm";
+import { Badge } from "@/components/ui/badge";
 
 const ProfileSetup = () => {
   const [displayName, setDisplayName] = useState("");
@@ -20,6 +21,29 @@ const ProfileSetup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Check for pre-selected skill
+  useEffect(() => {
+    const selectedSkill = localStorage.getItem('selectedSkill');
+    if (selectedSkill) {
+      try {
+        const skill = JSON.parse(selectedSkill);
+        // Auto-add the selected skill
+        setSkills([{
+          name: skill.name,
+          type: 'learn',
+          level: skill.difficulty_level || 'beginner'
+        }]);
+        
+        toast({
+          title: "Skill Added!",
+          description: `${skill.name} has been added to your learning goals.`,
+        });
+      } catch (error) {
+        console.error('Error parsing selected skill:', error);
+      }
+    }
+  }, [toast]);
 
   const handleAddSkill = (skill: SkillFormData) => {
     setSkills([...skills, skill]);
@@ -81,6 +105,10 @@ const ProfileSetup = () => {
         title: "Profile completed!",
         description: "Welcome to SkillSwap community",
       });
+
+      // Clear any stored selections
+      localStorage.removeItem('selectedSkill');
+      localStorage.removeItem('searchQuery');
 
       navigate("/dashboard");
     } catch (error) {

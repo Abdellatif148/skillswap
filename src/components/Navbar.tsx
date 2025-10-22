@@ -1,9 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
+import { skillsLibraryService } from "@/lib/skillsLibrary";
 
 const Navbar = () => {
   const navigate = useNavigate();
+
+  const handleBrowseSkills = async () => {
+    // Pre-load popular skills for better UX
+    try {
+      await skillsLibraryService.getPopularSkills();
+    } catch (error) {
+      console.error('Error pre-loading skills:', error);
+    }
+    navigate("/auth");
+  };
 
   return (
     <nav className="nav-modern">
@@ -19,14 +30,25 @@ const Navbar = () => {
           
           {/* Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <button className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200">
+            <button 
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              onClick={() => {
+                document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               How It Works
             </button>
-            <button className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200">
+            <button 
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              onClick={handleBrowseSkills}
+            >
               Browse Skills
             </button>
-            <button className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200">
-              About
+            <button 
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              onClick={() => navigate("/contact")}
+            >
+              Contact
             </button>
           </div>
           

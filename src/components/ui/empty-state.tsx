@@ -9,8 +9,10 @@ interface EmptyStateProps {
   action?: {
     label: string;
     onClick: () => void;
+    variant?: "default" | "outline" | "secondary";
   };
   className?: string;
+  size?: "sm" | "md" | "lg";
 }
 
 export const EmptyState = ({
@@ -18,16 +20,29 @@ export const EmptyState = ({
   title,
   description,
   action,
-  className
+  className,
+  size = "md"
 }: EmptyStateProps) => {
+  const sizeClasses = {
+    sm: "py-8 px-4",
+    md: "py-12 px-4", 
+    lg: "py-16 px-6"
+  };
+
+  const titleClasses = {
+    sm: "text-base",
+    md: "text-lg",
+    lg: "text-xl"
+  };
+
   return (
-    <div className={cn("flex flex-col items-center justify-center py-12 px-4 text-center", className)}>
+    <div className={cn("flex flex-col items-center justify-center text-center", sizeClasses[size], className)}>
       {icon && (
         <div className="mb-4 text-muted-foreground">
           {icon}
         </div>
       )}
-      <h3 className="text-lg font-semibold text-foreground mb-2">
+      <h3 className={cn("font-semibold text-foreground mb-2", titleClasses[size])}>
         {title}
       </h3>
       {description && (
@@ -36,7 +51,7 @@ export const EmptyState = ({
         </p>
       )}
       {action && (
-        <Button onClick={action.onClick}>
+        <Button onClick={action.onClick} variant={action.variant || "default"}>
           {action.label}
         </Button>
       )}

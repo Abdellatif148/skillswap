@@ -11,6 +11,7 @@ import { SkillCard } from "@/components/skills/SkillCard";
 import { useProfile } from "@/hooks/useProfile";
 import { useMatches } from "@/hooks/useMatches";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PLATFORM_STATS } from "@/lib/constants";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Skill Credits</p>
-                  <p className="text-2xl font-bold text-foreground">24</p>
+                  <p className="text-2xl font-bold text-foreground">{profile?.credits || 10}</p>
                 </div>
               </div>
             </Card>
@@ -58,7 +59,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Upcoming Sessions</p>
-                  <p className="text-2xl font-bold text-foreground">3</p>
+                  <p className="text-2xl font-bold text-foreground">0</p>
                 </div>
               </div>
             </Card>
@@ -73,7 +74,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">New Matches</p>
-                  <p className="text-2xl font-bold text-foreground">5</p>
+                  <p className="text-2xl font-bold text-foreground">{matches.length}</p>
                 </div>
               </div>
             </Card>
@@ -193,15 +194,17 @@ const Dashboard = () => {
             <div className="flex items-center justify-between text-white">
               <div>
                 <p className="text-white/80 text-sm mb-1">Your Balance</p>
-                <h3 className="text-3xl font-bold">24 Credits</h3>
-                <p className="text-white/90 text-sm mt-2">Earned: 30 • Spent: 6</p>
+                <h3 className="text-3xl font-bold">{profile?.credits || 10} Credits</h3>
+                <p className="text-white/90 text-sm mt-2">Start teaching to earn more!</p>
               </div>
               <Wallet className="w-16 h-16 text-white/30" />
             </div>
             <div className="flex gap-3 mt-4">
-              <Button variant="secondary" className="flex-1">Buy More</Button>
+              <Button variant="secondary" className="flex-1" onClick={() => navigate("/profile")}>
+                Add Skills
+              </Button>
               <Button variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20">
-                Redeem
+                Find Match
               </Button>
             </div>
           </Card>

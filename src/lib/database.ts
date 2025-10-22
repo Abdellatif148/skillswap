@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
+import { toast } from "@/components/ui/sonner";
 
 // Type definitions
 export type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -42,7 +43,8 @@ class DatabaseService {
 
   async executeQuery<T>(
     queryFn: () => Promise<{ data: T | null; error: any }>,
-    cacheKey?: string
+    cacheKey?: string,
+    showErrorToast: boolean = false
   ): Promise<T | null> {
     // Check cache first
     if (cacheKey) {
@@ -66,6 +68,11 @@ class DatabaseService {
       return data;
     } catch (err) {
       console.error('Database service error:', err);
+      if (showErrorToast) {
+        toast.error("Database Error", {
+          description: err instanceof Error ? err.message : "An unexpected error occurred"
+        });
+      }
       throw err;
     }
   }
@@ -223,7 +230,7 @@ export const skillsService = {
       .from('skills')
       .select(`
         *,
-        profiles!inner(display_name, avatar_url)
+        profile:profiles!inner(display_name, avatar_url)
       `)
       .ilike('skill_name', `%${query}%`);
 
@@ -233,7 +240,8 @@ export const skillsService = {
 
     const result = await dbService.executeQuery(
       () => queryBuilder.limit(20),
-      `search:${query}:${type || 'all'}`
+      `search:${query}:${type || 'all'}`,
+      true
     );
 
     return result || [];

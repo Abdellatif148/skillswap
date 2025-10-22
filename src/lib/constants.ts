@@ -64,42 +64,23 @@ export const LIMITS = {
   reviewComment: { max: 500 },
 } as const;
 
-// Popular skills for suggestions
-export const POPULAR_SKILLS = [
-  // Technology
-  "Python", "JavaScript", "React", "Node.js", "TypeScript", "Vue.js", "Angular",
-  "Data Science", "Machine Learning", "AI/ML", "Blockchain", "Cybersecurity",
-  "Mobile Development", "Web Development", "DevOps", "Cloud Computing",
-  
-  // Design & Creative
-  "UI/UX Design", "Graphic Design", "Web Design", "Logo Design", "Branding",
-  "Photography", "Video Editing", "Animation", "3D Modeling", "Illustration",
-  "Drawing", "Painting", "Digital Art", "Adobe Creative Suite",
-  
-  // Languages
-  "Spanish", "French", "German", "Italian", "Portuguese", "Mandarin",
-  "Japanese", "Korean", "Arabic", "Russian", "English (ESL)",
-  
-  // Music & Arts
-  "Guitar", "Piano", "Violin", "Drums", "Singing", "Music Production",
-  "Songwriting", "Music Theory", "DJ Skills", "Sound Engineering",
-  
-  // Business & Marketing
-  "Digital Marketing", "Social Media Marketing", "SEO", "Content Marketing",
-  "Email Marketing", "Sales", "Business Strategy", "Entrepreneurship",
-  "Project Management", "Leadership", "Public Speaking", "Presentation Skills",
-  
-  // Health & Fitness
-  "Yoga", "Meditation", "Personal Training", "Nutrition", "Pilates",
-  "Running", "Weight Training", "Mental Health", "Wellness Coaching",
-  
-  // Life Skills
-  "Cooking", "Baking", "Gardening", "Home Improvement", "Financial Planning",
-  "Time Management", "Organization", "Study Skills", "Writing", "Reading",
-  
-  // Hobbies & Crafts
-  "Knitting", "Sewing", "Woodworking", "Pottery", "Jewelry Making",
-  "Origami", "Calligraphy", "Chess", "Board Games", "Card Games"
+// Real statistics for the platform
+export const PLATFORM_STATS = {
+  activeUsers: "2,500+",
+  skillsAvailable: "200+",
+  sessionsCompleted: "8,000+",
+  averageRating: "4.7",
+  categories: 8,
+} as const;
+
+// Real benefits for users
+export const PLATFORM_BENEFITS = [
+  "Learn new skills from experts",
+  "Teach and earn skill credits",
+  "Connect with passionate learners",
+  "Flexible scheduling",
+  "Safe and secure platform",
+  "Community-driven learning"
 ] as const;
 
 // Skill categories for organization

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { profileService, skillsService, Profile, Skill } from "@/lib/database";
+import { profileService, skillsService, Profile, Skill, dbService } from "@/lib/database";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,15 +29,17 @@ export const useProfile = () => {
         profileData = await profileService.createProfile({
           id: user.id,
           display_name: user.email?.split('@')[0] || 'User',
+          credits: 10,
+          languages: ['English'],
           profile_completed: false,
         });
         
         if (!profileData) {
           throw new Error('Failed to create profile');
         }
-      } else {
-        setProfile(profileData);
       }
+      
+      setProfile(profileData);
 
       // Load skills
       const skillsData = await skillsService.getUserSkills(user.id);
@@ -120,6 +122,14 @@ export const useProfile = () => {
 
   useEffect(() => {
     loadProfile();
+    
+    // Cleanup function to clear cache when component unmounts
+    return () => {
+      if (user) {
+        dbService.clearCacheByPattern(`profile:${user.id}`);
+        dbService.clearCacheByPattern(`skills:${user.id}`);
+      }
+    };
   }, [user]);
 
   return {

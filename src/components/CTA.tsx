@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Users, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { PLATFORM_STATS } from "@/lib/constants";
 
 const CTA = () => {
   const navigate = useNavigate();
@@ -20,15 +21,15 @@ const CTA = () => {
           <div className="flex flex-wrap justify-center items-center gap-8 mb-8">
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">10,000+ Active Users</span>
+              <span className="text-sm font-medium text-muted-foreground">{PLATFORM_STATS.activeUsers} Active Users</span>
             </div>
             <div className="flex items-center gap-2">
               <Star className="w-5 h-5 text-yellow-500 fill-current" />
-              <span className="text-sm font-medium text-muted-foreground">4.9/5 Rating</span>
+              <span className="text-sm font-medium text-muted-foreground">{PLATFORM_STATS.averageRating}/5 Rating</span>
             </div>
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-secondary" />
-              <span className="text-sm font-medium text-muted-foreground">500+ Skills Available</span>
+              <span className="text-sm font-medium text-muted-foreground">{PLATFORM_STATS.skillsAvailable} Skills Available</span>
             </div>
           </div>
           
@@ -60,13 +61,20 @@ const CTA = () => {
           
           {/* Trust Indicators */}
           <div className="pt-12">
-            <p className="text-sm text-muted-foreground mb-6">Trusted by learners from</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-              {["Google", "Microsoft", "Apple", "Meta", "Netflix", "Spotify"].map((company) => (
-                <div key={company} className="text-lg font-semibold text-muted-foreground">
-                  {company}
-                </div>
-              ))}
+            <p className="text-sm text-muted-foreground mb-6">Join our growing community</p>
+            <div className="flex flex-wrap justify-center items-center gap-8">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{PLATFORM_STATS.categories}</div>
+                <div className="text-xs text-muted-foreground">Skill Categories</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-secondary">{PLATFORM_STATS.sessionsCompleted}</div>
+                <div className="text-xs text-muted-foreground">Sessions Completed</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{PLATFORM_STATS.averageRating}/5</div>
+                <div className="text-xs text-muted-foreground">Average Rating</div>
+              </div>
             </div>
           </div>
         </div>

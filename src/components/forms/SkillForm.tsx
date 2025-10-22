@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { skillsLibraryService, SkillLibraryItem } from "@/lib/skillsLibrary";
+import { useState, useEffect } from "react";
 
 export interface SkillFormData {
   name: string;
@@ -24,7 +26,33 @@ export const SkillForm = ({ onAddSkill, skills, onRemoveSkill, disabled = false 
   const [currentSkill, setCurrentSkill] = useState("");
   const [currentLevel, setCurrentLevel] = useState("beginner");
   const [currentType, setCurrentType] = useState<"teach" | "learn">("teach");
+  const [skillSuggestions, setSkillSuggestions] = useState<SkillLibraryItem[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
+  useEffect(() => {
+    if (currentSkill.length > 2) {
+      searchSkills(currentSkill);
+    } else {
+      setSkillSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [currentSkill]);
+
+  const searchSkills = async (query: string) => {
+    try {
+      const results = await skillsLibraryService.searchSkills(query, undefined, 5);
+      setSkillSuggestions(results);
+      setShowSuggestions(results.length > 0);
+    } catch (error) {
+      console.error('Error searching skills:', error);
+    }
+  };
+
+  const handleSkillSelect = (skill: SkillLibraryItem) => {
+    setCurrentSkill(skill.name);
+    setCurrentLevel(skill.difficulty_level);
+    setShowSuggestions(false);
+  };
   const handleAddSkill = () => {
     if (!currentSkill.trim()) return;
 
@@ -36,6 +64,7 @@ export const SkillForm = ({ onAddSkill, skills, onRemoveSkill, disabled = false 
 
     setCurrentSkill("");
     setCurrentLevel("beginner");
+    setShowSuggestions(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -85,14 +114,41 @@ export const SkillForm = ({ onAddSkill, skills, onRemoveSkill, disabled = false 
 
       {/* Add Skill Form */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 relative">
           <Input
             placeholder="Skill name (e.g., Web Design)"
             value={currentSkill}
-            onChange={(e) => setCurrentSkill(e.target.value)}
+            onChange={(e) => {
+              setCurrentSkill(e.target.value);
+            }}
             onKeyPress={handleKeyPress}
             disabled={disabled}
+            onFocus={() => currentSkill.length > 2 && setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           />
+          
+          {/* Skill Suggestions Dropdown */}
+          {showSuggestions && skillSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg border border-border shadow-lg z-50 max-h-48 overflow-y-auto">
+              {skillSuggestions.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
+                  onClick={() => handleSkillSelect(skill)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-sm">{skill.name}</div>
+                      <div className="text-xs text-muted-foreground">{skill.category?.name}</div>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      {skill.difficulty_level}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <Select
           value={currentLevel}

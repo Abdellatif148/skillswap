@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { PLATFORM_STATS } from "@/lib/constants";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -52,16 +53,16 @@ const Hero = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary">10K+</div>
+                <div className="text-3xl md:text-4xl font-bold text-primary">{PLATFORM_STATS.activeUsers}</div>
                 <div className="text-sm text-muted-foreground">Active Users</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-secondary">500+</div>
+                <div className="text-3xl md:text-4xl font-bold text-secondary">{PLATFORM_STATS.skillsAvailable}</div>
                 <div className="text-sm text-muted-foreground">Skills Available</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary">50K+</div>
-                <div className="text-sm text-muted-foreground">Sessions Completed</div>
+                <div className="text-3xl md:text-4xl font-bold text-primary">{PLATFORM_STATS.sessionsCompleted}</div>
+                <div className="text-sm text-muted-foreground">Learning Sessions</div>
               </div>
             </div>
           </div>
