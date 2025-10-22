@@ -1,4 +1,4 @@
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { TriangleAlert as AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "./button";
 import { Card } from "./card";
 import { cn } from "@/lib/utils";

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, TrendingUp, Loader2 } from "lucide-react";
+import { Search, SlidersHorizontal, TrendingUp, Loader as Loader2 } from "lucide-react";
 import { skillsLibraryService, SkillLibraryItem } from "@/lib/skillsLibrary";
 import { useToast } from "@/hooks/use-toast";
 

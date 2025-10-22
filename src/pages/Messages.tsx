@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Paperclip, Video, Phone, MoreVertical, Search, Sparkles } from "lucide-react";
+import { Send, Paperclip, Video, Phone, MoveVertical as MoreVertical, Search, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useMessages } from "@/hooks/useMessages";
