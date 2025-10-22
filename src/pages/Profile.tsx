@@ -21,6 +21,20 @@ const Profile = () => {
     );
   }
 
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Profile not found</h2>
+          <p className="text-muted-foreground mb-4">Unable to load your profile.</p>
+          <Button onClick={() => navigate("/dashboard")}>
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const milestones = [
     { id: 1, title: "Completed 5 sessions in Design", date: "2 weeks ago", icon: GraduationCap },
     { id: 2, title: "Reached Intermediate in Guitar", date: "1 month ago", icon: Award },
@@ -50,11 +64,11 @@ const Profile = () => {
                     <div className="flex items-center gap-4 text-muted-foreground text-sm">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
-                        San Francisco, CA
+                        {profile.location || "Location not set"}
                       </span>
                       <span className="flex items-center gap-1">
                         <Globe className="w-4 h-4" />
-                        English, Spanish
+                        {profile.languages?.join(", ") || "Languages not set"}
                       </span>
                     </div>
                   </div>
@@ -73,11 +87,11 @@ const Profile = () => {
                   </div>
                   <Badge variant="default" className="gap-1">
                     <GraduationCap className="w-3 h-3" />
-                    Teaching 3 skills
+                    Teaching {teachSkills.length} skills
                   </Badge>
                   <Badge variant="secondary" className="gap-1">
                     <BookOpen className="w-3 h-3" />
-                    Learning 2 skills
+                    Learning {learnSkills.length} skills
                   </Badge>
                 </div>
 
@@ -119,7 +133,7 @@ const Profile = () => {
           <Card className="p-6 shadow-card">
             <h2 className="text-2xl font-bold text-foreground mb-4">About</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {profile?.bio || "Passionate learner and teacher. I believe in the power of knowledge sharing and continuous growth. Always excited to connect with like-minded individuals who are eager to learn and share their expertise."}
+              {profile.bio || "This user hasn't added a bio yet."}
             </p>
           </Card>
 
@@ -142,15 +156,20 @@ const Profile = () => {
                         <Badge variant="default" className="text-xs">{skill.skill_level}</Badge>
                       </div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                        <span>12 hours taught</span>
+                        <span>Ready to teach</span>
                         <span className="flex items-center gap-1">
                           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                           4.9
                         </span>
                       </div>
-                      <Progress value={85} className="h-1.5" />
+                      <Progress value={100} className="h-1.5" />
                     </div>
                   ))}
+                  {teachSkills.length === 0 && (
+                    <p className="text-center text-muted-foreground py-4">
+                      No teaching skills added yet
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -168,12 +187,17 @@ const Profile = () => {
                         <Badge variant="secondary" className="text-xs">{skill.skill_level}</Badge>
                       </div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                        <span>8 hours learned</span>
-                        <span>65% progress</span>
+                        <span>Ready to learn</span>
+                        <span>Starting level</span>
                       </div>
-                      <Progress value={65} className="h-1.5" />
+                      <Progress value={20} className="h-1.5" />
                     </div>
                   ))}
+                  {learnSkills.length === 0 && (
+                    <p className="text-center text-muted-foreground py-4">
+                      No learning skills added yet
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
