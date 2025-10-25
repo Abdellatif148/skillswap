@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { profileService, skillsService } from "@/lib/database";
 import { Button } from "@/components/ui/button";

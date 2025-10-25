@@ -17,36 +17,43 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="nav-modern">
+    <nav className="nav-modern" role="navigation" aria-label="Main navigation">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
+          <button 
+            className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity touch-target" 
+            onClick={() => navigate("/")}
+            aria-label="Go to homepage"
+          >
             <div className="w-10 h-10 rounded-xl bg-gradient-hero flex items-center justify-center shadow-card hover-scale">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground tracking-tight">SkillSwap</span>
-          </div>
+          </button>
           
           {/* Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <button 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 touch-target"
               onClick={() => {
                 document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
               }}
+              aria-label="Learn how SkillSwap works"
             >
               How It Works
             </button>
             <button 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 touch-target"
               onClick={handleBrowseSkills}
+              aria-label="Browse available skills"
             >
               Browse Skills
             </button>
             <button 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 touch-target"
               onClick={() => navigate("/contact")}
+              aria-label="Contact us"
             >
               Contact
             </button>

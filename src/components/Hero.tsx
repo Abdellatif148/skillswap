@@ -37,6 +37,7 @@ const Hero = () => {
                 size="lg" 
                 onClick={() => navigate("/auth")}
                 className="btn-gradient-hover px-8 py-4 text-lg font-semibold rounded-2xl group shadow-hover"
+                aria-label="Start swapping skills - Sign up now"
               >
                 Start Swapping Skills
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
@@ -45,6 +46,7 @@ const Hero = () => {
                 size="lg" 
                 variant="outline"
                 className="px-8 py-4 text-lg font-medium rounded-2xl border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
+                aria-label="Learn how SkillSwap works"
               >
                 How It Works
               </Button>

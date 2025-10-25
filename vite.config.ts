@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     target: 'esnext',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -23,13 +24,16 @@ export default defineConfig(({ mode }) => ({
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
           utils: ['clsx', 'tailwind-merge'],
           supabase: ['@supabase/supabase-js'],
+          router: ['react-router-dom'],
+          query: ['@tanstack/react-query'],
+          icons: ['lucide-react'],
         },
       },
     },
     sourcemap: mode === 'development',
     minify: mode === 'production' ? 'esbuild' : false,
     reportCompressedSize: false,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
   },
   optimizeDeps: {
     include: [
@@ -37,8 +41,12 @@ export default defineConfig(({ mode }) => ({
       'react-dom', 
       '@supabase/supabase-js',
       'lucide-react',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      'react-router-dom',
+      'clsx',
+      'tailwind-merge'
     ],
+    exclude: ['@vercel/analytics', '@vercel/speed-insights'],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

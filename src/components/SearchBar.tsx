@@ -81,12 +81,14 @@ const SearchBar = () => {
                 handleSearch(e.target.value);
               }}
               onKeyPress={(e) => e.key === 'Enter' && handleSearchSubmit()}
+              aria-label="Search for skills to learn or teach"
             />
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-primary/60" />
             <Button 
               className="absolute right-3 top-1/2 -translate-y-1/2 btn-gradient-hover rounded-2xl px-8 py-3 font-semibold"
               onClick={handleSearchSubmit}
               disabled={loading}
+              aria-label="Search for skills"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Search"}
             </Button>
