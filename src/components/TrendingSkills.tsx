@@ -73,9 +73,10 @@ const TrendingSkills = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
-          {trendingSkills.map((skill, index) => (
+          {trendingSkills.map((skill, index) => {
             const colorClasses = getColorClasses(index);
-            <Card 
+            return (
+              <Card 
               key={skill.id}
               className={`card-modern p-6 ${colorClasses.bgColor} border-0 group animate-slide-up hover:scale-105 transition-all duration-300 cursor-pointer`}
               style={{ animationDelay: `${index * 100}ms` }}
@@ -124,8 +125,9 @@ const TrendingSkills = () => {
                   </Button>
                 </div>
               </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
         
         <div className="text-center">
